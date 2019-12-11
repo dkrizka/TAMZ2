@@ -31,8 +31,31 @@ public class JSONWeatherParser {
 
             //weather
             JSONArray jsonArray = jsonObject.getJSONArray("weather");
+            JSONObject jsonWeather = jsonArray.getJSONObject(0);
+            weather.currentCondition.setWeatherId(Tools.getInt("id",jsonWeather));
+            weather.currentCondition.setDescription(Tools.getString("description",jsonWeather));
+            weather.currentCondition.setCondition(Tools.getString("main",jsonWeather));
+            weather.currentCondition.setIcon(Tools.getString("icon",jsonWeather));
+
+            JSONObject mainObj = Tools.getObject("main", jsonObject);
+            weather.currentCondition.setHumidity(Tools.getInt("humidity", mainObj));
+            weather.currentCondition.setPressure(Tools.getInt("pressure", mainObj));
+            weather.currentCondition.setMinTemp(Tools.getFloat("temp_min", mainObj));
+            weather.currentCondition.setMaxTemp(Tools.getFloat("temp_max", mainObj));
+            weather.currentCondition.setTemperature(Tools.getFloat("temp", mainObj));
+
+            JSONObject windObj = Tools.getObject("wind", jsonObject);
+            weather.wind.setSpeed(Tools.getFloat("speed",windObj));
+            weather.wind.setDeg(Tools.getFloat("deg",windObj));
+
+            JSONObject cloudObj = Tools.getObject("clouds", jsonObject);
+            weather.clouds.setPrecipitation(Tools.getInt("all",cloudObj));
+
+            return weather;
+
         } catch (JSONException e) {
             e.printStackTrace();
+            return null;
         }
 
 

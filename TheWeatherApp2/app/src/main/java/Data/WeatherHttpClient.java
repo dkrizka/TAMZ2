@@ -17,7 +17,7 @@ public class WeatherHttpClient {
         InputStream inputStream = null;
 
         try {
-            connection =(HttpURLConnection) (new URL(Tools.BASE_URL + location)).openConnection();
+            connection =(HttpURLConnection) (new URL(Tools.BASE_URL + location + Tools.API_KEY)).openConnection();
             connection.setRequestMethod("GET");
             connection.setDoInput(true);
             connection.setDoInput(true);

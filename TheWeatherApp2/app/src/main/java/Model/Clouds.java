@@ -1,13 +1,13 @@
 package Model;
 
 public class Clouds {
-    private int percipitation;
+    private int precipitation;
 
-    public int getPercipitation() {
-        return percipitation;
+    public int getPrecipitation() {
+        return precipitation;
     }
 
-    public void setPercipitation(int percipitation) {
-        this.percipitation = percipitation;
+    public void setPrecipitation(int precipitation) {
+        this.precipitation = precipitation;
     }
 }
