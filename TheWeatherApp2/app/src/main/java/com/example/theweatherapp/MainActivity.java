@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
     public void renderWeatherData (String city)
     {
         WeatherTask weatherTask = new WeatherTask();
-        weatherTask.execute(new String[]{city + "&units=metric"});
+        weatherTask.execute(new String[]{city + "&APPID=" + Tools.API_KEY + "&units=metric"});
     }
     private class DownloadImageAsyncTask extends AsyncTask<String, Void, Bitmap>
     {
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
             Log.v("Data: ", weather.currentCondition.getDescription());
 
-            new DownloadImageAsyncTask().execute(new String [] { weather.iconData});
+            new DownloadImageAsyncTask().execute(weather.iconData);
 
             return weather;
         }
