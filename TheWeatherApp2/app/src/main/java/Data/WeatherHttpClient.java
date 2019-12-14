@@ -13,11 +13,10 @@ import Tool.Tools;
 public class WeatherHttpClient {
 
     public String getWeatherData(String location) {
-        HttpURLConnection connection = null;
         InputStream inputStream = null;
 
         try {
-            connection =(HttpURLConnection) (new URL(Tools.BASE_URL + location + Tools.API_KEY)).openConnection();
+            HttpURLConnection connection =(HttpURLConnection) (new URL("http://api.openweathermap.org/data/2.5/weather?q=London,uk&APPID=a6ef01561f64261f833e988170c4bec9")).openConnection();
             connection.setRequestMethod("GET");
             connection.setDoInput(true);
             connection.setDoInput(true);
