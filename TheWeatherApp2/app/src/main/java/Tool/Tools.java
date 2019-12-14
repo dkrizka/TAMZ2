@@ -7,7 +7,7 @@ import org.json.JSONObject;
 
 public class Tools {
     public static final String BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
-    public static final String API_KEY = "&a6ef01561f64261f833e988170c4bec9";
+    public static final String API_KEY = "a6ef01561f64261f833e988170c4bec9";
     public static final String ICON_URL = "http://api.openweathermap.org/img/w/";
 
     public static JSONObject getObject(String tagName, JSONObject jsonObject) throws JSONException{
