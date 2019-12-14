@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -126,12 +127,8 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("WrongThread")
         @Override
         protected Weather doInBackground(String... params) {
-            WeatherHttpClient testik = new WeatherHttpClient();
-            String test_data = testik.getWeatherData("London,uk");
-
-            Log.d("test test test test","boiiiiiiiiiiiiiiiiiiiiiiiiiiiii " + test_data);
             String data = ( (new WeatherHttpClient().getWeatherData(params[0])));
-            Log.d("test test test test","dATA = " + data);
+            Log.d("test test test test","Dataaaaaaaaaaaaaaaaaaaaaaaaa = " + data);
             weather = JSONWeatherParser.getWeather(data);
 
             weather.iconData = weather.currentCondition.getIcon();
@@ -177,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-    private void showInputDialog()
+    public void showInputDialog()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Změnit město");

@@ -19,6 +19,8 @@ public class JSONWeatherParser {
             JSONObject jsonObject = new JSONObject(data);
             Location place = new Location();
 
+            int code = Tools.getInt("cod", jsonObject);
+
             JSONObject coordObj = Tools.getObject("coord", jsonObject);
             place.setLat(Tools.getFloat("lat",coordObj));
             place.setLon(Tools.getFloat("lon",coordObj));
@@ -54,6 +56,10 @@ public class JSONWeatherParser {
             JSONObject cloudObj = Tools.getObject("clouds", jsonObject);
             weather.clouds.setPrecipitation(Tools.getInt("all",cloudObj));
 
+            if (code == 404)
+            {
+               //dodelat error
+            }
             return weather;
 
         } catch (JSONException e) {
