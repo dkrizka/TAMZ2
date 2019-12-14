@@ -38,7 +38,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import Data.CityPreference;
 import Data.JSONWeatherParser;
@@ -77,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         updated = (TextView) findViewById(R.id.AktualizaceText);
 
         CityPreference cityPreference = new CityPreference(MainActivity.this);
-
         renderWeatherData(cityPreference.getCity());
 
     }
@@ -125,13 +126,15 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("WrongThread")
         @Override
         protected Weather doInBackground(String... params) {
+            WeatherHttpClient testik = new WeatherHttpClient();
+            String test_data = testik.getWeatherData("London,uk");
 
+            Log.d("test test test test","boiiiiiiiiiiiiiiiiiiiiiiiiiiiii " + test_data);
             String data = ( (new WeatherHttpClient().getWeatherData(params[0])));
-
+            Log.d("test test test test","dATA = " + data);
             weather = JSONWeatherParser.getWeather(data);
-            weather.iconData = weather.currentCondition.getIcon();
 
-            Log.v("Data: ", weather.currentCondition.getDescription());
+            weather.iconData = weather.currentCondition.getIcon();
 
             new DownloadImageAsyncTask().execute(weather.iconData);
 
@@ -141,10 +144,22 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Weather weather) {
             super.onPostExecute(weather);
 
-            DateFormat dateFormat = DateFormat.getTimeInstance();
-            String sunriseDate = dateFormat.format(new Date(weather.location.getSunrise()));
-            String sunsetDate = dateFormat.format(new Date(weather.location.getSunset()));
-            String updateDate = dateFormat.format(new Date(weather.location.getLastupdate()));
+            Date currentDate_date = new Date(weather.location.getSunrise() * 1000);
+            String sunriseDate = DateFormat.getInstance().format(currentDate_date);
+            //DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, DateFormat.LONG, Locale.getDefault());
+           // String sunriseDate = dateFormat.format(new Date(weather.location.getSunrise()));
+            Date sunsetDate_date = new Date(weather.location.getSunset() * 1000);
+            String sunsetDate = DateFormat.getInstance().format(sunsetDate_date);
+
+            Date updateDate_date = new Date(weather.location.getLastupdate() * 1000);
+            String updateDate = DateFormat.getInstance().format(updateDate_date);
+            //Date d = new Date(weather.location.getSunrise() * 1000);
+
+            //for (int i = 0; i < weather.location.getSunrise().length; ++i) {
+             //   output.println(df.format(myDate[i]) + "; ");
+            //}
+            Log.d("Testing =  ", "Sunrise, sunset and update = " + sunriseDate + sunsetDate + updateDate );
+
 
             DecimalFormat decimalFormat = new DecimalFormat("#.#");
             String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
