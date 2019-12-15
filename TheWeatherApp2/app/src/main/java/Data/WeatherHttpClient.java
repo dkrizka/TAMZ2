@@ -35,20 +35,20 @@ public class WeatherHttpClient {
             ;
             String line = null;
             while ((line = bufferedReader.readLine())!=null){
-                Log.d("HTTPClient", "index=" + line);
                 stringBuffer.append(line + "\r\n");
             }
+            Log.d("testik","OK_String Buffer= " + stringBuffer);
 
             inputStream.close();
 
 
             return stringBuffer.toString();
         } catch (IOException e) {
-           // Toast.makeText("",)
-            Log.d("testik","catch");
-            //location = "Ostrava,CZ";
-            Log.d("testik","catchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh = ");
-            e.printStackTrace();
+            StringBuffer errorBuffer = new StringBuffer();
+            errorBuffer.append("{\"cod\":\"404\",\"message\":\"city not found\"}");
+
+            Log.d("testik","ERROR Buffer= " + errorBuffer);
+            return errorBuffer.toString();
         }
         finally {
             Log.d("test test test test", "finally = " + urlConnection);
@@ -57,7 +57,7 @@ public class WeatherHttpClient {
             }
 
 
-        }return null;
+        }
 
     }
 }

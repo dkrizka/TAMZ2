@@ -9,10 +9,11 @@
         android:orderInCategory="100"
         app:showAsAction="always"
         />
-    <item
+  <!--  story for another time
+        <item
         android:id="@+id/change_den"
         android:title="@string/change_den"
         android:orderInCategory="100"
         app:showAsAction="always"
-        />
+        /> -->
 </menu>

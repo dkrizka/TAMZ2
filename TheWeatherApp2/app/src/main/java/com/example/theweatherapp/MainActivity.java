@@ -130,47 +130,52 @@ public class MainActivity extends AppCompatActivity {
             String data = ( (new WeatherHttpClient().getWeatherData(params[0])));
             Log.d("test test test test","Dataaaaaaaaaaaaaaaaaaaaaaaaa = " + data);
             weather = JSONWeatherParser.getWeather(data);
+            if(weather.code.getCode() != 404) {
+                weather.iconData = weather.currentCondition.getIcon();
 
-            weather.iconData = weather.currentCondition.getIcon();
-
-            new DownloadImageAsyncTask().execute(weather.iconData);
-
+                new DownloadImageAsyncTask().execute(weather.iconData);
+            }
+            else {
+                weather.iconData = "#FF0000";
+            }
             return weather;
         }
         @Override
         protected void onPostExecute(Weather weather) {
             super.onPostExecute(weather);
+            if(weather.code.getCode() !=404) {
+                Date currentDate_date = new Date(weather.location.getSunrise() * 1000);
+                String sunriseDate = DateFormat.getInstance().format(currentDate_date);
+                Date sunsetDate_date = new Date(weather.location.getSunset() * 1000);
+                String sunsetDate = DateFormat.getInstance().format(sunsetDate_date);
+                Date updateDate_date = new Date(weather.location.getLastupdate() * 1000);
+                String updateDate = DateFormat.getInstance().format(updateDate_date);
 
-            Date currentDate_date = new Date(weather.location.getSunrise() * 1000);
-            String sunriseDate = DateFormat.getInstance().format(currentDate_date);
-            //DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG, DateFormat.LONG, Locale.getDefault());
-           // String sunriseDate = dateFormat.format(new Date(weather.location.getSunrise()));
-            Date sunsetDate_date = new Date(weather.location.getSunset() * 1000);
-            String sunsetDate = DateFormat.getInstance().format(sunsetDate_date);
+                DecimalFormat decimalFormat = new DecimalFormat("#.#");
+                String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
 
-            Date updateDate_date = new Date(weather.location.getLastupdate() * 1000);
-            String updateDate = DateFormat.getInstance().format(updateDate_date);
-            //Date d = new Date(weather.location.getSunrise() * 1000);
+                cityName.setText(weather.location.getCity() + "," + weather.location.getCountry());
+                temp.setText("" + tempFormat + "°C");
+                humidity.setText("Vlhkost: " + weather.currentCondition.getHumidity() + "%");
+                pressure.setText("Tlak: " + weather.currentCondition.getPressure() + "hPa");
+                wind.setText("Vítr: " + weather.wind.getSpeed() + "mps");
+                sunrise.setText("Svítání: " + sunriseDate);
+                sunset.setText("Stmívání " + sunsetDate);
+                updated.setText("Naposledy aktualizováno: " + updateDate);
+                description.setText("Podmínky: " + weather.currentCondition.getCondition() + "(" + weather.currentCondition.getDescription() + ")");
+            }
+            else{
+                cityName.setText("Spatne mesto");
+                temp.setText("Chyba");
+                humidity.setText("Chyba");
+                pressure.setText("Chyba");
+                wind.setText("Chyba");
+                sunrise.setText("Chyba");
+                sunset.setText("Chyba");
+                updated.setText("Format mesta : Ostrava,CZ");
+                description.setText("Chyba");
 
-            //for (int i = 0; i < weather.location.getSunrise().length; ++i) {
-             //   output.println(df.format(myDate[i]) + "; ");
-            //}
-            Log.d("Testing =  ", "Sunrise, sunset and update = " + sunriseDate + sunsetDate + updateDate );
-
-
-            DecimalFormat decimalFormat = new DecimalFormat("#.#");
-            String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
-
-            cityName.setText(weather.location.getCity() + "," + weather.location.getCountry());
-            temp.setText("" + tempFormat + "°C");
-            humidity.setText("Vlhkost: " +  weather.currentCondition.getHumidity() + "%");
-            pressure.setText("Tlak: " + weather.currentCondition.getPressure() + "hPa");
-            wind.setText("Vítr: " + weather.wind.getSpeed() + "mps");
-            sunrise.setText("Svítání: " + sunriseDate );
-            sunset.setText("Stmívání " + sunsetDate);
-            updated.setText("Naposledy aktualizováno: " + updateDate);
-            description.setText("Podmínky: " + weather.currentCondition.getCondition() + "(" + weather.currentCondition.getDescription()+")");
-
+            }
         }
 
     }

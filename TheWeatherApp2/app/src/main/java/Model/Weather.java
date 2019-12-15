@@ -1,6 +1,7 @@
 package Model;
 
 public class Weather {
+    public Code code = new Code();
     public Location location;
     public String iconData;
     public CurrentCondition currentCondition = new CurrentCondition();
