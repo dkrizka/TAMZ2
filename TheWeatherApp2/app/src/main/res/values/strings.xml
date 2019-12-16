@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Počasí</string>
     <string name="change_mesto">Změnit město</string>
-    <string name="change_den">Změnit den</string>
+    <string name="change_den_zpet">Zpět</string>
+    <string name="change_den_dalsi">Další</string>
 </resources>

@@ -22,7 +22,7 @@ public class WeatherHttpClient {
 
 
         try {
-            url = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + location + "&APPID=a6ef01561f64261f833e988170c4bec9");
+            url = new URL("http://api.openweathermap.org/data/2.5/forecast?q=" + location + "&APPID=a6ef01561f64261f833e988170c4bec9");
 
             urlConnection = (HttpURLConnection) url.openConnection();
 

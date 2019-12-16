@@ -1,6 +1,8 @@
 package Model;
 
+
 public class Weather {
+    public Timeframe timeframe = new Timeframe();
     public Code code = new Code();
     public Location location;
     public String iconData;

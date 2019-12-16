@@ -64,4 +64,5 @@ public class Location {
     public void setLastupdate(long lastupdate) {
         this.lastupdate = lastupdate;
     }
+
 }

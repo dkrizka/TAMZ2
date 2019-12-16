@@ -40,7 +40,9 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import Data.CityPreference;
@@ -61,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView sunrise;
     private TextView sunset;
     private TextView updated;
-
+    private TextView timeframe;
+    public int position=0;
     Weather weather = new Weather();
+    List<Weather> weatherList = new ArrayList<Weather>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +82,13 @@ public class MainActivity extends AppCompatActivity {
         sunrise = (TextView) findViewById(R.id.SvitaniText);
         sunset = (TextView) findViewById((R.id.SoumrakText));
         updated = (TextView) findViewById(R.id.AktualizaceText);
+        timeframe = (TextView) findViewById(R.id.timeframeText) ;
+
+        // zobrazení předpovědi pro více dnů nebo alespon hodin, swipovat na jine hodiny/dny
+        //historii oblibene, možno do listu
+        //senzory na zasade GPS, ziskat aktualni polohu
+
+
 
         CityPreference cityPreference = new CityPreference(MainActivity.this);
         renderWeatherData(cityPreference.getCity());
@@ -122,65 +133,82 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    private class WeatherTask extends AsyncTask<String, Void, Weather>{
+    private class WeatherTask extends AsyncTask<String, Void, List<Weather> >{
         //check this wrong thread
         @SuppressLint("WrongThread")
         @Override
-        protected Weather doInBackground(String... params) {
+        protected List<Weather> doInBackground(String... params) {
             String data = ( (new WeatherHttpClient().getWeatherData(params[0])));
             Log.d("test test test test","Dataaaaaaaaaaaaaaaaaaaaaaaaa = " + data);
-            weather = JSONWeatherParser.getWeather(data);
-            if(weather.code.getCode() != 404) {
-                weather.iconData = weather.currentCondition.getIcon();
+            weatherList = JSONWeatherParser.getWeather(data);
 
-                new DownloadImageAsyncTask().execute(weather.iconData);
+            Log.d("test test test test","weather list size = " + weatherList.size());
+            for(int i=0; i < weatherList.size();i++)
+            {
+                Log.d("test test test test","TEPLOOOOTAAAAAA  = " + weatherList.get(i).currentCondition.getTemperature());
+            }
+
+            Log.d("test test test test"," LIST code = " + weatherList.get(0));
+            if(weatherList.get(0).code.getCode() != 404) {
+                    weatherList.get(0).iconData = weatherList.get(0).currentCondition.getIcon();
+
+                    new DownloadImageAsyncTask().execute(weatherList.get(0).iconData);
+
             }
             else {
-                weather.iconData = "#FF0000";
+                    weatherList.get(0).iconData = "#FF0000";
+
             }
-            return weather;
+
+            return weatherList;
         }
         @Override
-        protected void onPostExecute(Weather weather) {
-            super.onPostExecute(weather);
-            if(weather.code.getCode() !=404) {
-                Date currentDate_date = new Date(weather.location.getSunrise() * 1000);
-                String sunriseDate = DateFormat.getInstance().format(currentDate_date);
-                Date sunsetDate_date = new Date(weather.location.getSunset() * 1000);
-                String sunsetDate = DateFormat.getInstance().format(sunsetDate_date);
-                Date updateDate_date = new Date(weather.location.getLastupdate() * 1000);
-                String updateDate = DateFormat.getInstance().format(updateDate_date);
+        protected void onPostExecute(List<Weather> weatherList) {
+            super.onPostExecute(weatherList);
+            int i=0;
+                if(weatherList.get(i).code.getCode() !=404) {
+                    Date currentDate_date = new Date(weatherList.get(i).location.getSunrise() * 1000);
+                    String sunriseDate = DateFormat.getInstance().format(currentDate_date);
+                    Date sunsetDate_date = new Date(weatherList.get(i).location.getSunset() * 1000);
+                    String sunsetDate = DateFormat.getInstance().format(sunsetDate_date);
+                    Date updateDate_date = new Date(weatherList.get(i).location.getLastupdate() * 1000);
+                    String updateDate = DateFormat.getInstance().format(updateDate_date);
+                    //Date timeframe_date = new Date(weatherList.get(i).location.getTimeframe() * 1000);
+                    //String timeFrame = DateFormat.getInstance().format(timeframe_date);
 
-                DecimalFormat decimalFormat = new DecimalFormat("#.#");
-                String tempFormat = decimalFormat.format(weather.currentCondition.getTemperature());
+                    DecimalFormat decimalFormat = new DecimalFormat("#.#");
+                    String tempFormat = decimalFormat.format(weatherList.get(i).currentCondition.getTemperature());
+                    timeframe.setText("Timeframe = " + weatherList.get(position).timeframe.getTimeframe());
+                    cityName.setText(weatherList.get(i).location.getCity());
+                    temp.setText("" + tempFormat + "°C");
+                    humidity.setText("Vlhkost: " + weatherList.get(i).currentCondition.getHumidity() + "%");
+                    pressure.setText("Tlak: " + weatherList.get(i).currentCondition.getPressure() + "hPa");
+                    wind.setText("Vítr: " + weatherList.get(i).wind.getSpeed() + "mps");
+                    sunrise.setText("Svítání: " + sunriseDate);
+                    sunset.setText("Stmívání " + sunsetDate);
+                    updated.setText("Naposledy aktualizováno: " + updateDate);
+                    description.setText("Podmínky: " + weatherList.get(i).currentCondition.getCondition() + "(" + weatherList.get(i).currentCondition.getDescription() + ")");
+                }
+                else{
+                    cityName.setText("Spatne mesto");
+                    timeframe.setText("Chyba");
+                    temp.setText("Chyba");
+                    humidity.setText("Chyba");
+                    pressure.setText("Chyba");
+                    wind.setText("Chyba");
+                    sunrise.setText("Chyba");
+                    sunset.setText("Chyba");
+                    updated.setText("Format mesta : Ostrava,CZ");
+                    description.setText("Chyba");
 
-                cityName.setText(weather.location.getCity() + "," + weather.location.getCountry());
-                temp.setText("" + tempFormat + "°C");
-                humidity.setText("Vlhkost: " + weather.currentCondition.getHumidity() + "%");
-                pressure.setText("Tlak: " + weather.currentCondition.getPressure() + "hPa");
-                wind.setText("Vítr: " + weather.wind.getSpeed() + "mps");
-                sunrise.setText("Svítání: " + sunriseDate);
-                sunset.setText("Stmívání " + sunsetDate);
-                updated.setText("Naposledy aktualizováno: " + updateDate);
-                description.setText("Podmínky: " + weather.currentCondition.getCondition() + "(" + weather.currentCondition.getDescription() + ")");
-            }
-            else{
-                cityName.setText("Spatne mesto");
-                temp.setText("Chyba");
-                humidity.setText("Chyba");
-                pressure.setText("Chyba");
-                wind.setText("Chyba");
-                sunrise.setText("Chyba");
-                sunset.setText("Chyba");
-                updated.setText("Format mesta : Ostrava,CZ");
-                description.setText("Chyba");
+                }
 
-            }
         }
 
     }
     public void showInputDialog()
     {
+        position=0;
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Změnit město");
 
@@ -201,6 +229,71 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.show();
     }
+    public void goDayBack()
+    {
+
+        if(position !=0) {
+
+            position = position -1;
+            if(weatherList.get(0).code.getCode() != 404) {
+                weatherList.get(position).iconData = weatherList.get(position).currentCondition.getIcon();
+
+                new DownloadImageAsyncTask().execute(weatherList.get(position).iconData);
+
+            }
+            else {
+                    weatherList.get(position).iconData = "#FF0000";
+
+            }
+
+            Log.d("test test test test","Position  = " + position + "fakin temperature = " + weatherList.get(position));
+            DecimalFormat decimalFormat = new DecimalFormat("#.#");
+
+            String tempFormat = decimalFormat.format(weatherList.get(position).currentCondition.getTemperature());
+
+            //Date timeframe_date = new Date(weatherList.get(position).location.getTimeframe() * 1000);
+            //String timeFrame = DateFormat.getInstance().format(timeframe_date);
+
+            description.setText("Podmínky: " + weatherList.get(position).currentCondition.getCondition() + "(" + weatherList.get(position).currentCondition.getDescription() + ")");
+            timeframe.setText("Timeframe = " + weatherList.get(position).timeframe.getTimeframe());
+            temp.setText("" + tempFormat + "°C");
+            humidity.setText("Vlhkost: " + weatherList.get(position).currentCondition.getHumidity() + "%");
+            pressure.setText("Tlak: " + weatherList.get(position).currentCondition.getPressure() + "hPa");
+            wind.setText("Vítr: " + weatherList.get(position).wind.getSpeed() + "mps");
+            Log.d("test test test test","Position  = " + position + "fakin temperature = " + tempFormat);
+        }
+    }
+    public void goDayForward()
+    {
+        if(position<39) {
+            position = position + 1;
+            if (weatherList.get(0).code.getCode() != 404) {
+                weatherList.get(position).iconData = weatherList.get(position).currentCondition.getIcon();
+
+                new DownloadImageAsyncTask().execute(weatherList.get(position).iconData);
+
+            } else {
+                weatherList.get(position).iconData = "#FF0000";
+
+            }
+            Log.d("test test test test", "Position  = " + position + "fakin temperature = " + weatherList.get(position));
+            wind.setText("Vitr = " + weatherList.get(position).wind.getSpeed() + "mps");
+            DecimalFormat decimalFormat = new DecimalFormat("#.#");
+
+            //Date timeframe_date = new Date(weatherList.get(position).location.getTimeframe() * 1000);
+            //String timeFrame = DateFormat.getInstance().format(timeframe_date);
+
+            Log.d("test test test test", "Position  = " + position + " fakin temperature = " + weatherList.get(position).currentCondition.getDescription());
+            String tempFormat = decimalFormat.format(weatherList.get(position).currentCondition.getTemperature());
+            description.setText("Podmínky: " + weatherList.get(position).currentCondition.getCondition() + "(" + weatherList.get(position).currentCondition.getDescription() + ")");
+            timeframe.setText("Timeframe = " + weatherList.get(position).timeframe.getTimeframe());
+            temp.setText("" + tempFormat + "°C");
+            humidity.setText("Vlhkost: " + weatherList.get(position).currentCondition.getHumidity() + "%");
+            pressure.setText("Tlak: " + weatherList.get(position).currentCondition.getPressure() + "hPa");
+            wind.setText("Vítr: " + weatherList.get(position).wind.getSpeed() + "mps");
+            Log.d("test test test test", "Position  = " + position + " fakin temperature = " + tempFormat);
+        }
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -212,6 +305,14 @@ public class MainActivity extends AppCompatActivity {
         if(id == R.id.change_mesto)
         {
             showInputDialog();
+        }
+        if(id == R.id.change_den_zpet)
+        {
+            goDayBack();
+        }
+        if(id == R.id.change_den_dalsi)
+        {
+            goDayForward();
         }
         return super.onOptionsItemSelected(item);
     }
