@@ -2,17 +2,28 @@ package com.example.theweatherapp;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewDebug;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,7 +62,10 @@ import Data.WeatherHttpClient;
 import Model.Weather;
 import Tool.Tools;
 
-public class MainActivity extends AppCompatActivity {
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private TextView cityName;
     private TextView temp;
@@ -64,13 +78,40 @@ public class MainActivity extends AppCompatActivity {
     private TextView sunset;
     private TextView updated;
     private TextView timeframe;
+    Button geoButton;
     public int position=0;
     Weather weather = new Weather();
     List<Weather> weatherList = new ArrayList<Weather>();
+
+    protected LocationManager locationManager;
+    protected LocationListener locationListener;
+    protected Context context;
+    TextView txtLat;
+    String lat;
+    String provider;
+    protected String latitude,longitude;
+    protected boolean gps_enabled,network_enabled;
+
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        if (ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        } else {
+            ActivityCompat.requestPermissions(this, new String[] {
+                            ACCESS_FINE_LOCATION,
+                            ACCESS_COARSE_LOCATION },
+                    1);
+
+        }
+        //Location loca = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        //onLocationChanged(loca);
 
         cityName = (TextView) findViewById(R.id.mestoText);
         iconView = (ImageView) findViewById(R.id.thumbnail);
@@ -82,18 +123,61 @@ public class MainActivity extends AppCompatActivity {
         sunrise = (TextView) findViewById(R.id.SvitaniText);
         sunset = (TextView) findViewById((R.id.SoumrakText));
         updated = (TextView) findViewById(R.id.AktualizaceText);
-        timeframe = (TextView) findViewById(R.id.timeframeText) ;
+        timeframe = (TextView) findViewById(R.id.timeframeText);
+        geoButton = findViewById(R.id.button1);
+
+        geoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Location loca = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                onLocationChanged(loca);
+                Toast.makeText(getApplicationContext(), "Satellites just targeted you", Toast.LENGTH_LONG).show();//display the text of button1
+            }
+        });
+
 
         // zobrazení předpovědi pro více dnů nebo alespon hodin, swipovat na jine hodiny/dny
         //historii oblibene, možno do listu
         //senzory na zasade GPS, ziskat aktualni polohu
 
-
-
         CityPreference cityPreference = new CityPreference(MainActivity.this);
-        renderWeatherData(cityPreference.getCity());
+        renderWeatherData("q=" + cityPreference.getCity());
 
     }
+    @Override
+    public void onLocationChanged(Location location) {
+        /*int lat = (int)location.getLatitude();
+        //DecimalFormat df = new DecimalFormat("#.");
+
+            latitude = String.format("%d",lat);
+
+        int lon = (int)location.getLongitude();
+
+            longitude =  String.format("%d",lon);
+*/
+        Log.d("test before a test","Latitude:" + latitude + ", Longitude:" + longitude);
+        txtLat = (TextView) findViewById(R.id.textview1);
+        txtLat.setText("Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+        Log.d("test test test test","Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
+        renderWeatherData("lat="+ location.getLatitude() + "&lon=" + location.getLongitude());
+        locationManager.removeUpdates(this);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Log.d("Latitude","disable");
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        Log.d("Latitude","enable");
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        Log.d("Latitude","status");
+    }
+
     public void renderWeatherData (String city)
     {
         WeatherTask weatherTask = new WeatherTask();
@@ -224,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
 
                 String newCity = cityPreference.getCity();
 
-                renderWeatherData(newCity);
+                renderWeatherData("q=" + newCity);
             }
         });
         builder.show();
@@ -315,5 +399,8 @@ public class MainActivity extends AppCompatActivity {
             goDayForward();
         }
         return super.onOptionsItemSelected(item);
+    }
+    public boolean onButtonClickListener(){
+        return true;
     }
 }
