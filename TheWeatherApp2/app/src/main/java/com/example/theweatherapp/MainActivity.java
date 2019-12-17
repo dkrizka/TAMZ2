@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private TextView updated;
     private TextView timeframe;
     Button geoButton;
+    Button dayBackButton;
+    Button dayForwardButton;
     public int position=0;
     Weather weather = new Weather();
     List<Weather> weatherList = new ArrayList<Weather>();
@@ -125,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         updated = (TextView) findViewById(R.id.AktualizaceText);
         timeframe = (TextView) findViewById(R.id.timeframeText);
         geoButton = findViewById(R.id.button1);
+        dayBackButton = findViewById(R.id.buttonDayBack);
+        dayForwardButton = findViewById(R.id.buttonDayForward);
+
 
         geoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,14 +139,28 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 Toast.makeText(getApplicationContext(), "Satellites just targeted you", Toast.LENGTH_LONG).show();//display the text of button1
             }
         });
+        dayBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goDayBack();
+            }
+        });
+        dayForwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goDayForward();
+            }
+        });
 
 
-        // zobrazení předpovědi pro více dnů nebo alespon hodin, swipovat na jine hodiny/dny
-        //historii oblibene, možno do listu
-        //senzory na zasade GPS, ziskat aktualni polohu
+
+        // zobrazení předpovědi pro více dnů nebo alespon hodin, swipovat na jine hodiny/dny - done bez swipování
+        //historii oblibene, možno do listu -
+        //senzory na zasade GPS, ziskat aktualni polohu - done
 
         CityPreference cityPreference = new CityPreference(MainActivity.this);
-        renderWeatherData("q=" + cityPreference.getCity());
+        //renderWeatherData("q=" + cityPreference.getCity());
+        renderWeatherData("q=Ostrava,CZ");
 
     }
     @Override
@@ -226,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Log.d("test test test test","Dataaaaaaaaaaaaaaaaaaaaaaaaa = " + data);
             weatherList = JSONWeatherParser.getWeather(data);
 
-            Log.d("test test test test","weather list size = " + weatherList.size());
+            //Log.d("test test test test","weather list size = " + weatherList.size());
             for(int i=0; i < weatherList.size();i++)
             {
                 Log.d("test test test test","TEPLOOOOTAAAAAA  = " + weatherList.get(i).currentCondition.getTemperature());
@@ -316,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     public void goDayBack()
     {
 
-        if(position !=0) {
+        if(position > 0) {
 
             position = position -1;
             if(weatherList.get(0).code.getCode() != 404) {
@@ -346,10 +365,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             wind.setText("Vítr: " + weatherList.get(position).wind.getSpeed() + "mps");
             Log.d("test test test test","Position  = " + position + "fakin temperature = " + tempFormat);
         }
+
+        else {dayBackButton.setEnabled(false);}
+        if(position < 39 && position > 0 && (dayBackButton.isEnabled() == false|| dayForwardButton.isEnabled() == false) )
+        {
+            dayForwardButton.setEnabled(true);
+            dayBackButton.setEnabled(true);
+        }
     }
     public void goDayForward()
     {
+
         if(position<39) {
+
             position = position + 1;
             if (weatherList.get(0).code.getCode() != 404) {
                 weatherList.get(position).iconData = weatherList.get(position).currentCondition.getIcon();
@@ -377,6 +405,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             wind.setText("Vítr: " + weatherList.get(position).wind.getSpeed() + "mps");
             Log.d("test test test test", "Position  = " + position + " fakin temperature = " + tempFormat);
         }
+        else {dayForwardButton.setEnabled(false);}
+        if(position < 39 && position > 0 && (dayBackButton.isEnabled() == false|| dayForwardButton.isEnabled() == false) )
+        {
+            dayForwardButton.setEnabled(true);
+            dayBackButton.setEnabled(true);
+        }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -390,17 +424,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         {
             showInputDialog();
         }
-        if(id == R.id.change_den_zpet)
-        {
-            goDayBack();
-        }
-        if(id == R.id.change_den_dalsi)
-        {
-            goDayForward();
-        }
         return super.onOptionsItemSelected(item);
     }
-    public boolean onButtonClickListener(){
-        return true;
-    }
+
 }

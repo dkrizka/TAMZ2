@@ -145,5 +145,24 @@
         android:text="Get current location"
         />
 
+    <Button
+        android:id="@+id/buttonDayBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button1"
+        android:layout_marginTop="50dp"
+        android:layout_marginRight="150dp"
+        android:text="Go 3 hours back" />
+
+    <Button
+        android:id="@+id/buttonDayForward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/button1"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="220dp"
+        android:text="Go 3 hours forward"
+        />
+
 
 </RelativeLayout>

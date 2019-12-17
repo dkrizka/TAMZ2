@@ -30,12 +30,12 @@ public class JSONWeatherParser {
         try {
             JSONObject jsonObject_pre = new JSONObject(data);
 
-            String tagname = "0";
+            int code = Tools.getInt("cod", jsonObject_pre);
+            if (code != 404) {
             JSONArray forecastArray = jsonObject_pre.getJSONArray("list");
             Location place = new Location();
-            int code = Tools.getInt("cod", jsonObject_pre);
 
-            if (code != 404) {
+
                 JSONObject cityObj = Tools.getObject("city", jsonObject_pre);
                 place.setCity(Tools.getString("name",cityObj));
 
@@ -90,9 +90,19 @@ public class JSONWeatherParser {
                 }
                 for(int i=0; i < weatherList.size();i++)
                 {
-                    Log.d("test test test test","TEPLOOOOTAAAAAA  = " + weatherList.get(i).currentCondition.getTemperature());
+                    Log.d("testing","Index = " + i + " Code = " + weatherList.get(i).code.getCode());
                 }
 
+            }
+            else{
+
+                Weather weather = new Weather();
+                weather.code.setCode(code);
+                weatherList.add(weather);
+            }
+            for(int i=0; i < weatherList.size();i++)
+            {
+                Log.d("test test test test","Code = " + weatherList.get(i).currentCondition.getTemperature());
             }
 
             return weatherList;

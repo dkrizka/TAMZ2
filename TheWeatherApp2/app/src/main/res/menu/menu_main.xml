@@ -10,16 +10,4 @@
         app:showAsAction="always"
         />
 
-        <item
-        android:id="@+id/change_den_zpet"
-        android:title="@string/change_den_zpet"
-        android:orderInCategory="100"
-        app:showAsAction="always"
-        />
-    <item
-        android:id="@+id/change_den_dalsi"
-        android:title="@string/change_den_dalsi"
-        android:orderInCategory="100"
-        app:showAsAction="always"
-        />
 </menu>
